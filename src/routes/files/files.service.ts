@@ -2,12 +2,7 @@ import { Request, Response } from 'express';
 import { readdir } from 'fs/promises';
 import { uploadFile } from '../../middleware/upload';
 
-export interface IFilesService {
-    readDirectory: (path: string) => Promise<Array<string>>;
-    uploadFile: (req: Request, res: Response) => Promise<void>;
-}
-
-export class FilesService implements IFilesService {
+export class FilesService {
     async readDirectory(path: string) {
         return await readdir(path);
     }

@@ -1,9 +1,11 @@
+import { mock } from 'jest-mock-extended';
 import { controller } from './home.controller';
+import type { Request, Response } from 'express';
 
 describe('HomeController', () => {
     it('should call send with welcome message', () => {
-        const fakeRequest = {} as any;
-        const fakeResponse = { send: jest.fn() } as any;
+        const fakeRequest = mock<Request>({});
+        const fakeResponse = mock<Response>();
 
         controller(fakeRequest, fakeResponse);
 

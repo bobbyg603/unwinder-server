@@ -10,9 +10,9 @@ const port = process.env.PORT ?? 3000;
 const baseUrl = `http://localhost:${port}`;
 
 describe('Files', () => {
-    let fileName: any;
-    let fileContents: any;
-    let uploadFilePath: any;
+    let fileName: string;
+    let fileContents: string;
+    let uploadFilePath: string;
 
     beforeEach(() => {
         const uuid = uuidv4();

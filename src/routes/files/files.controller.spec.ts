@@ -1,31 +1,29 @@
 import { get, post } from './files.controller';
+import { mock, MockProxy } from 'jest-mock-extended';
+import { FilesService } from './files.service';
+import type { Response, Request } from 'express';
 
 describe('FilesController', () => {
-    let fakeFiles: any;
-    let fakeFilesService: any;
-    let fakeResponse: any;
+    let fakeFiles: Array<string>;
+    let fakeFilesService: MockProxy<FilesService>;
+    let fakeResponse: MockProxy<Response>;
 
     beforeEach(() => {
-        fakeFilesService = {
-            readDirectory: jest.fn(),
-            uploadFile: jest.fn()
-        };
+
+        fakeFilesService = mock<FilesService>();
         fakeFiles = ['sweet', 'emotion'];
         fakeFilesService.readDirectory.mockResolvedValue(fakeFiles);
         fakeFilesService.uploadFile.mockResolvedValue();
 
-        fakeResponse = {
-            send: jest.fn(),
-            status: jest.fn()
-        };
+        fakeResponse = mock<Response>();
         fakeResponse.status.mockReturnValue(fakeResponse);
     });
 
     describe('get', () => {
-        let fileUploadPath: any;
+        let fileUploadPath: string;
 
         beforeEach(async () => {
-            const fakeRequest = {} as any;
+            const fakeRequest = mock<Request>({});
             fileUploadPath = 'ramblin\' man';
             process.env['FILE_UPLOAD_PATH'] = fileUploadPath;
 
@@ -43,7 +41,7 @@ describe('FilesController', () => {
 
     describe('post', () => {
         it('should call uploadFile with req and res', async () => {
-            const fakeRequest = { song: 'beast of burden' } as any;
+            const fakeRequest = mock<Request>({});
 
             await post(fakeRequest, fakeResponse, fakeFilesService);
 
@@ -51,7 +49,7 @@ describe('FilesController', () => {
         });
 
         it('should return 400 if no file is attached', async () => {
-            const fakeRequest = { song: 'more than a feeling' } as any;
+            const fakeRequest = mock<Request>({ file: undefined });
 
             await post(fakeRequest, fakeResponse, fakeFilesService);
 
@@ -64,11 +62,11 @@ describe('FilesController', () => {
         });
 
         it('should return 200 if upload succeeds', async () => {
-            const fakeRequest = {
+            const fakeRequest = mock<Request>({
                 file: {
                     originalname: 'doge.jpg'
                 }
-            } as any;
+            });
 
             await post(fakeRequest, fakeResponse, fakeFilesService);
 
@@ -83,7 +81,7 @@ describe('FilesController', () => {
         describe('error', () => {
             it('should return 400 if file is too big', async () => {
                 const fileUploadMaxSizeMb = 123;
-                const fakeRequest = { song: 'bad moon rising' } as any;
+                const fakeRequest = mock<Request>({});
                 const error = {
                     ...new Error('bugsplat!'),
                     code: 'LIMIT_FILE_SIZE'
@@ -102,11 +100,11 @@ describe('FilesController', () => {
             });
 
             it('should return 500 with message for all other errors', async () => {
-                const fakeRequest = {
+                const fakeRequest = mock<Request>({
                     file: {
                         originalname: 'doge.jpg'
                     }
-                } as any;
+                });
                 const error = new Error('bugsplat!');
                 fakeFilesService.uploadFile.mockImplementation(() => { throw error });
 
